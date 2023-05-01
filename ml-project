@@ -1,0 +1,30 @@
+import io
+from google.cloud import vision
+from google.cloud.vision import types
+
+client = vision.ImageAnnotatorClient()
+
+with io.open('IELTS-template.jpg', 'rb') as image_file:
+    content = image_file.read()
+
+image = types.Image(content=content)
+
+response = client.annotate_image({
+    'image': image,
+    'features': [{'type': vision.enums.Feature.Type.TEXT_DETECTION},
+                 {'type': vision.enums.Feature.Type.FACE_DETECTION},
+                 {'type': vision.enums.Feature.Type.OBJECT_LOCALIZATION}]
+})
+
+text = response.text_annotations[0].description
+faces = response.face_annotations
+objects = response.localized_object_annotations
+
+print("Text:")
+print(text)
+print("\nFaces:")
+for face in faces:
+    print(face)
+print("\nObjects:")
+for obj in objects:
+    print(obj)
